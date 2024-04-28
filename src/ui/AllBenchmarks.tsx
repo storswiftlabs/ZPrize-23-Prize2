@@ -17,6 +17,8 @@ export const AllBenchmarks: React.FC = () => {
   const [bigIntScalars, setBigIntScalars] = useState<bigint[]>([]);
   const [u32Points, setU32Points] = useState<U32ArrayPoint[]>([]);
   const [u32Scalars, setU32Scalars] = useState<Uint32Array[]>([]);
+  const [uPoints, setUPoints] = useState<Uint32Array>(new Uint32Array(0));
+  const [uScalars, setUScalars] = useState<Uint32Array>(new Uint32Array(0));
   const [expectedResult, setExpectedResult] = useState<{x: bigint, y: bigint} | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [benchmarkResults, setBenchmarkResults] = useState<any[][]>([["InputSize", "MSM Func", "Time (MS)"]]);
@@ -56,6 +58,22 @@ export const AllBenchmarks: React.FC = () => {
     setU32Scalars(newU32Scalars);
     setExpectedResult(testCase.expectedResult);
     setDisabledBenchmark(false);
+
+
+    let pointsAsU32s = new Uint32Array(newU32Points.length * 32);
+    newU32Points.forEach((point, index) => {
+        pointsAsU32s.set(point.x, index * 32);
+        pointsAsU32s.set(point.y, index * 32 + 8);
+        pointsAsU32s.set(point.t, index * 32 + 16);
+        pointsAsU32s.set(point.z, index * 32 + 24);
+      });
+    let scalarsAsU32s = new Uint32Array(newU32Scalars.length * 8);
+    newU32Scalars.forEach((u32Array, index) => {
+        scalarsAsU32s.set(u32Array, index * 8);
+      });
+
+      setUPoints(pointsAsU32s);
+      setUScalars(scalarsAsU32s);
   };
 
   const useRandomInputs = () => {
@@ -110,7 +128,7 @@ export const AllBenchmarks: React.FC = () => {
         <CSVExportButton data={benchmarkResults} filename={'msm-benchmark'} />
       </div>
       
-      <Benchmark
+      {/* <Benchmark
         name={'Pippenger WebGPU MSM'}
         disabled={disabledBenchmark}
         baseAffinePoints={baseAffineBigIntPoints}
@@ -157,14 +175,12 @@ export const AllBenchmarks: React.FC = () => {
         msmFunc={webgpu_best_msm}
         postResult={postResult}
         bold={true}
-      />
+      /> */}
       <Benchmark
         name={'Your MSM'}
         disabled={disabledBenchmark}
-        baseAffinePoints={u32Points}
-        scalars={u32Scalars}
-        // baseAffinePoints={baseAffineBigIntPoints}
-        // scalars={bigIntScalars}
+        baseAffinePoints={uPoints}
+        scalars={uScalars}
         expectedResult={expectedResult}
         msmFunc={compute_msm}
         postResult={postResult}

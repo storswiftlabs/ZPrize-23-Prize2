@@ -43,29 +43,12 @@ const SCALAR_BITS = 253; // 253 bits for scalar
 ///        T <- T + T_j
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const compute_msm = async (
-  baseAffinePoints: BigIntPoint[] | U32ArrayPoint[],
-  basescalars: bigint[] | Uint32Array[]
+  baseAffinePoints: BigIntPoint[] | U32ArrayPoint[] | Uint32Array,
+  basescalars: bigint[] | Uint32Array[] | Uint32Array
   ): Promise<{x: bigint, y: bigint}> => {
 
-    let pointsAsU32s: Uint32Array;
-    let scalarsAsU32s: Uint32Array;
-    if (typeof basescalars[0] === "bigint") {
-      const flattenedPoints = (baseAffinePoints as BigIntPoint[]).flatMap(point => [point.x, point.y, point.t, point.z]);
-      pointsAsU32s = bigIntsToU32Array(flattenedPoints);
-      scalarsAsU32s = bigIntsToU32Array(basescalars as bigint[]);
-    } else {
-      pointsAsU32s = new Uint32Array(baseAffinePoints.length * 32);
-      (baseAffinePoints as U32ArrayPoint[]).forEach((point, index) => {
-        pointsAsU32s.set(point.x, index * 32);
-        pointsAsU32s.set(point.y, index * 32 + 8);
-        pointsAsU32s.set(point.t, index * 32 + 16);
-        pointsAsU32s.set(point.z, index * 32 + 24);
-      });
-      scalarsAsU32s = new Uint32Array(basescalars.length * 8);
-      (basescalars as Uint32Array[]).forEach((u32Array, index) => {
-        scalarsAsU32s.set(u32Array, index * 8);
-      });
-    }
+    const pointsAsU32s  = baseAffinePoints as Uint32Array;
+    const scalarsAsU32s = basescalars as Uint32Array;
 
     const bufferResult = await pippinger_msm(
       { u32Inputs: pointsAsU32s, individualInputSize: EXT_POINT_SIZE }, 
