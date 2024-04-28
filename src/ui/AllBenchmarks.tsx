@@ -59,21 +59,20 @@ export const AllBenchmarks: React.FC = () => {
     setExpectedResult(testCase.expectedResult);
     setDisabledBenchmark(false);
 
-
-    let pointsAsU32s = new Uint32Array(newU32Points.length * 32);
+    const pointsAsU32s = new Uint32Array(newU32Points.length * 32);
     newU32Points.forEach((point, index) => {
         pointsAsU32s.set(point.x, index * 32);
         pointsAsU32s.set(point.y, index * 32 + 8);
         pointsAsU32s.set(point.t, index * 32 + 16);
         pointsAsU32s.set(point.z, index * 32 + 24);
       });
-    let scalarsAsU32s = new Uint32Array(newU32Scalars.length * 8);
+    const scalarsAsU32s = new Uint32Array(newU32Scalars.length * 8);
     newU32Scalars.forEach((u32Array, index) => {
         scalarsAsU32s.set(u32Array, index * 8);
       });
 
-      setUPoints(pointsAsU32s);
-      setUScalars(scalarsAsU32s);
+    setUPoints(pointsAsU32s);
+    setUScalars(scalarsAsU32s);
   };
 
   const useRandomInputs = () => {
@@ -108,6 +107,21 @@ export const AllBenchmarks: React.FC = () => {
       setBigIntScalars(newScalars);
       const newU32Scalars = newScalars.map((scalar) => bigIntToU32Array(scalar));
       setU32Scalars(newU32Scalars);
+
+      const pointsAsU32s = new Uint32Array(newU32Points.length * 32);
+      newU32Points.forEach((point, index) => {
+          pointsAsU32s.set(point.x, index * 32);
+          pointsAsU32s.set(point.y, index * 32 + 8);
+          pointsAsU32s.set(point.t, index * 32 + 16);
+          pointsAsU32s.set(point.z, index * 32 + 24);
+        });
+      const scalarsAsU32s = new Uint32Array(newU32Scalars.length * 8);
+      newU32Scalars.forEach((u32Array, index) => {
+          scalarsAsU32s.set(u32Array, index * 8);
+        });
+  
+      setUPoints(pointsAsU32s);
+      setUScalars(scalarsAsU32s);
     }
     generateNewInputs();
     setComparisonResults([]);
@@ -128,7 +142,7 @@ export const AllBenchmarks: React.FC = () => {
         <CSVExportButton data={benchmarkResults} filename={'msm-benchmark'} />
       </div>
       
-      {/* <Benchmark
+      <Benchmark
         name={'Pippenger WebGPU MSM'}
         disabled={disabledBenchmark}
         baseAffinePoints={baseAffineBigIntPoints}
@@ -175,7 +189,7 @@ export const AllBenchmarks: React.FC = () => {
         msmFunc={webgpu_best_msm}
         postResult={postResult}
         bold={true}
-      /> */}
+      />
       <Benchmark
         name={'Your MSM'}
         disabled={disabledBenchmark}
